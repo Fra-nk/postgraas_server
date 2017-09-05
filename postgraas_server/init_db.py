@@ -1,6 +1,6 @@
-from postgraas_server.management_database import init_db
-import postgres_instance_driver as pg
+from postgraas_server.backends.docker import postgres_instance_driver as pg
 from postgraas_server.configuration import get_config
+from postgraas_server.management_database import init_db
 
 
 def main():

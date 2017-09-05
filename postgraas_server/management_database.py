@@ -59,7 +59,7 @@ def init_db(db_credentials, postgraas_app):
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
 
-    from postgraas_server.management_resources import db
+    from postgraas_server.backends.docker.management_resources import db
     with postgraas_app.app_context():
         if not is_sane_database(db.Model, db.session):
             db.drop_all()

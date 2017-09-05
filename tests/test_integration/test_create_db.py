@@ -1,9 +1,10 @@
-from postgraas_server import create_db, init_db
-import postgraas_server.postgres_instance_driver as pid
 import os
-from subprocess import check_call
 import pytest
+from subprocess import check_call
 
+import postgraas_server.backends.docker.postgres_instance_driver as pid
+from postgraas_server import init_db
+from postgraas_server.backends.docker import create_db
 
 this_dir = os.path.dirname(__file__)
 

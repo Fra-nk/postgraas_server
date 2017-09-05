@@ -1,12 +1,12 @@
-import unittest
+import docker
+import json
 import os
+import unittest
 from mock import patch, MagicMock, Mock
 
-import json
+import postgraas_server.backends.docker.postgres_instance_driver as pid
 import postgraas_server.configuration as configuration
 from postgraas_server.create_app import create_app
-import postgraas_server.postgres_instance_driver as pid
-import docker
 from .utils import wait_for_postgres_listening
 
 
@@ -41,14 +41,14 @@ class TestPostgraasApi(unittest.TestCase):
         self.this_app.config['TESTING'] = True
         self.app = self.this_app.test_client()
         self.delete_all_test_postgraas_container()
-        from postgraas_server.management_resources import db
+        from postgraas_server.backends.docker.management_resources import db
         with self.this_app.app_context():
             db.drop_all()
             db.create_all()
 
     def tearDown(self):
         self.delete_all_test_postgraas_container()
-        from postgraas_server.management_resources import db
+        from postgraas_server.backends.docker.management_resources import db
         with self.this_app.app_context():
             db.drop_all()
 

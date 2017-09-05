@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_restful import fields, Resource, marshal_with, Api, reqparse
-from postgraas_server.management_resources import db
-from postgraas_server.management_resources import DBInstanceResource, DBInstanceCollectionResource
+
+from postgraas_server.backends.docker.management_resources import DBInstanceResource, DBInstanceCollectionResource
+from postgraas_server.backends.docker.management_resources import db
 from postgraas_server.configuration import get_meta_db_config_path
 
 
