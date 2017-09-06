@@ -35,7 +35,3 @@ def test_create_init_db(cov_runner):
 
     init_db_file = init_db.__file__
     cov_runner(init_db_file)
-
-
-
-

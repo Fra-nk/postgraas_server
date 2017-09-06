@@ -1,6 +1,5 @@
 import unittest
 import os
-import ConfigParser
 
 import postgraas_server.configuration as cf
 
@@ -18,5 +17,3 @@ class TestConfiguration(unittest.TestCase):
         actual = cf.get_config(test_config)
         expected = 'postgraas'
         self.assertEqual(actual.get('metadb', 'db_name'), expected)
-
-

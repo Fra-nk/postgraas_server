@@ -7,14 +7,16 @@ def main():
     from postgraas_server import postgraas_api
     config = get_config()
     db_credentials = {
-            "db_name": config.get('metadb', 'db_name'),
-            "db_username": config.get('metadb', 'db_username'),
-            "db_pwd": config.get('metadb', 'db_pwd'),
-            "host": config.get('metadb', 'host'),
-            "port": config.get('metadb', 'port')
-        }
-    pg.wait_for_postgres(db_credentials['db_name'], db_credentials['db_username'], db_credentials['db_pwd'],
-                          db_credentials['host'], db_credentials['port'])
+        "db_name": config.get('metadb', 'db_name'),
+        "db_username": config.get('metadb', 'db_username'),
+        "db_pwd": config.get('metadb', 'db_pwd'),
+        "host": config.get('metadb', 'host'),
+        "port": config.get('metadb', 'port')
+    }
+    pg.wait_for_postgres(
+        db_credentials['db_name'], db_credentials['db_username'], db_credentials['db_pwd'],
+        db_credentials['host'], db_credentials['port']
+    )
     print "initializing db"
     init_db(db_credentials, postgraas_api.app)
 

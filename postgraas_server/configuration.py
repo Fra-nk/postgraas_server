@@ -2,7 +2,7 @@ import os
 import logging
 import ConfigParser
 
-__all__ = ['get_config', 'get_config_filename', 'expand_env_vars']
+__all__ = ['get_config', 'get_default_config_filename', 'expand_env_vars']
 
 logger = logging.getLogger(__name__)
 

@@ -7,11 +7,12 @@ from postgraas_server.management_database import is_sane_database
 
 
 class TestManagementDatabase(unittest.TestCase):
-
     def setUp(self):
         self.module_path = os.path.abspath(os.path.dirname(__file__))
-        self.this_app = create_app(configuration.get_config(os.path.join(self.module_path, 'postgraas_server.cfg')))
-        #self.this_app.debug = True
+        self.this_app = create_app(
+            configuration.get_config(os.path.join(self.module_path, 'postgraas_server.cfg'))
+        )
+        # self.this_app.debug = True
         self.this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
         self.this_app.use_reloader = False
         self.this_app.config['TESTING'] = True
@@ -35,6 +36,7 @@ class TestManagementDatabase(unittest.TestCase):
         with self.this_app.app_context():
             is_sane = is_sane_database(db.Model, db.session)
         self.assertEqual(False, is_sane)
+
 
 if __name__ == '__main__':
     unittest.main()
