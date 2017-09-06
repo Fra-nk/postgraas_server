@@ -27,7 +27,7 @@ class DBInstance(db.Model):
     container_id = db.Column(db.String(100))
 
     def __init__(
-        self, postgraas_instance_name, db_name, username, password, hostname, port, container_id
+        self, postgraas_instance_name, db_name, username, password, hostname, port, container_id=None
     ):
         self.postgraas_instance_name = postgraas_instance_name
         self.creation_timestamp = datetime.datetime.now()
@@ -92,7 +92,7 @@ class DBInstanceResource(Resource):
             }
 
         backend = get_backend(get_config())
-        if not backend.exists(entity.container_id):
+        if not backend.exists(entity):
             logger.warning(
                 "container {} does not exist, how could that happen?".format(entity.container_id)
             )
@@ -104,7 +104,7 @@ class DBInstanceResource(Resource):
             }
 
         try:
-            backend.delete(entity.container_id)
+            backend.delete(entity)
         except APIError as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
             return {'status': 'failed', 'msg': str(e)}
@@ -144,22 +144,23 @@ class DBInstanceCollectionResource(Resource):
                 'msg':
                 "postgraas_instance_name already exists {}".format(args['postgraas_instance_name'])
             }
-        try:
-            db_credentials['container_id'] = pg.create_postgres_instance(
-                args['postgraas_instance_name'], db_credentials
-            )
-        except APIError as e:
-            return {'msg': str(e)}
         db_entry = DBInstance(
             postgraas_instance_name=args['postgraas_instance_name'],
             db_name=args['db_name'],
             username=args['db_username'],
             password="",
             hostname=db_credentials['host'],
-            port=db_credentials['port'],
-            container_id=db_credentials['container_id']
+            port=db_credentials['port']
         )
+        backend = get_backend(get_config())
+        try:
+            ## this is an artifact of the docker only version...we should htink about it
+            db_entry.container_id = backend.create(db_entry, db_credentials)
+        except APIError as e:
+            return {'msg': str(e)}
+
         db.session.add(db_entry)
         db.session.commit()
+        db_credentials["container_id"] = db_entry.container_id
         db_credentials["postgraas_instance_id"] = db_entry.id
         return db_credentials
