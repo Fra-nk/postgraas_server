@@ -1,5 +1,6 @@
 from postgraas_server.backends.docker import postgres_instance_driver as pg
 from postgraas_server.configuration import get_config
+from postgraas_server.utils import wait_for_postgres
 
 
 def create_db_container():
@@ -25,7 +26,7 @@ def create_db_container():
 def main():
     print "creating container for the management db"
     db_credentials = create_db_container()
-    pg.wait_for_postgres(
+    wait_for_postgres(
         db_credentials['db_name'], db_credentials['db_username'], db_credentials['db_pwd'],
         db_credentials['host'], db_credentials['port']
     )

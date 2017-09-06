@@ -47,14 +47,14 @@ class TestPostgraasApi(unittest.TestCase):
         self.this_app.config['TESTING'] = True
         self.app = self.this_app.test_client()
         self.delete_all_test_postgraas_container()
-        from postgraas_server.backends.docker.management_resources import db
+        from postgraas_server.management_resources import db
         with self.this_app.app_context():
             db.drop_all()
             db.create_all()
 
     def tearDown(self):
         self.delete_all_test_postgraas_container()
-        from postgraas_server.backends.docker.management_resources import db
+        from postgraas_server.management_resources import db
         with self.this_app.app_context():
             db.drop_all()
 

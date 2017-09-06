@@ -7,6 +7,8 @@ from flask_restful import fields, Resource, marshal_with, reqparse
 from flask_sqlalchemy import SQLAlchemy
 
 import postgraas_server.backends.docker.postgres_instance_driver as pg
+from postgraas_server.backends import get_backend
+from postgraas_server.configuration import get_config
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +91,8 @@ class DBInstanceResource(Resource):
                 'msg': 'Could not connect to postgres instance: {}'.format(connection_error)
             }
 
-        if not pg.check_container_exists(entity.container_id):
+        backend = get_backend(get_config())
+        if not backend.exists(entity.container_id):
             logger.warning(
                 "container {} does not exist, how could that happen?".format(entity.container_id)
             )
@@ -101,7 +104,7 @@ class DBInstanceResource(Resource):
             }
 
         try:
-            pg.delete_postgres_instance(entity.container_id)
+            backend.delete(entity.container_id)
         except APIError as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
             return {'status': 'failed', 'msg': str(e)}

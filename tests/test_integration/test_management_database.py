@@ -18,12 +18,12 @@ class TestManagementDatabase(unittest.TestCase):
         self.this_app.config['TESTING'] = True
 
     def tearDown(self):
-        from postgraas_server.backends.docker.management_resources import db
+        from postgraas_server.management_resources import db
         with self.this_app.app_context():
             db.drop_all()
 
     def test_is_sane_database(self):
-        from postgraas_server.backends.docker.management_resources import db
+        from postgraas_server.management_resources import db
         with self.this_app.app_context():
             db.drop_all()
             db.create_all()
@@ -32,7 +32,7 @@ class TestManagementDatabase(unittest.TestCase):
         self.assertEqual(True, is_sane)
 
     def test_is_not_sane_database(self):
-        from postgraas_server.backends.docker.management_resources import db
+        from postgraas_server.management_resources import db
         with self.this_app.app_context():
             is_sane = is_sane_database(db.Model, db.session)
         self.assertEqual(False, is_sane)
