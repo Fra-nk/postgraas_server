@@ -8,8 +8,8 @@ env:
 - DB=postgraas_metadb USERNAME=postgraas_user PASSWORD=postgraas_password
 before_install:
 - docker pull postgres:9.4
-- psql -c 'create user $USERNAME with password \'$PASSWORD\'' -U postgres
-- psql -c 'create database $DB OWNER $USERNAME' -U postgres
+- psql -c "create user $USERNAME with password '$PASSWORD';" -U postgres
+- psql -c "create database $DB OWNER $USERNAME;" -U postgres
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
