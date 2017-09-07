@@ -43,7 +43,7 @@ password = {password}
 """.format(
     database=os.environ.get('DATABASE', 'postgres'),
     username=os.environ.get('USERNAME', 'postgres'),
-    password=os.environ.get('PASSWORD', 'postgres')
+    password=os.environ.get('PGPASSWORD', 'postgres')
 )
 
 CONFIGS = {

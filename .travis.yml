@@ -5,11 +5,11 @@ services:
 - docker
 - postgresql
 env:
-- DB=postgres USERNAME=postgres PASSWORD=postgraas_password
+- DB=postgres USERNAME=postgres PGPASSWORD=postgraas_password
 before_install:
 - docker pull postgres:9.4
-- psql -c "alter user $USERNAME with password '$PASSWORD';" -U postgres
-- PGPASSWORD=$PASSWORD psql -c "create database $DB OWNER $USERNAME;" -U postgres
+- psql -c "alter user $USERNAME with password '$PGPASSWORD';" -U postgres
+- psql -c "create database $DB OWNER $USERNAME;" -U postgres
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
