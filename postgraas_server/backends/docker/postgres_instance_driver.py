@@ -1,7 +1,4 @@
-__author__ = 'sebastian neubauer'
 import docker
-import psycopg2
-import time
 
 
 def get_hostname():

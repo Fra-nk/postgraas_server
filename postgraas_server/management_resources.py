@@ -1,14 +1,12 @@
-__author__ = 'sebastianneubauer'
 import datetime
 import logging
 import psycopg2
-from docker.errors import APIError
+
+from flask import current_app
 from flask_restful import fields, Resource, marshal_with, reqparse
 from flask_sqlalchemy import SQLAlchemy
 
-import postgraas_server.backends.docker.postgres_instance_driver as pg
-from postgraas_server.backends import get_backend
-from postgraas_server.configuration import get_config
+from postgraas_server.backends.exceptions import PostgraasApiException
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +25,14 @@ class DBInstance(db.Model):
     container_id = db.Column(db.String(100))
 
     def __init__(
-        self, postgraas_instance_name, db_name, username, password, hostname, port, container_id=None
+        self,
+        postgraas_instance_name,
+        db_name,
+        username,
+        password,
+        hostname,
+        port,
+        container_id=None
     ):
         self.postgraas_instance_name = postgraas_instance_name
         self.creation_timestamp = datetime.datetime.now()
@@ -77,7 +82,7 @@ class DBInstanceResource(Resource):
             conn = psycopg2.connect(
                 user=entity.username,
                 password=args['db_pwd'],
-                host='127.0.0.1',
+                host=current_app.postgraas_backend.master_hostname,
                 port=entity.port,
                 dbname=entity.db_name
             )
@@ -91,8 +96,7 @@ class DBInstanceResource(Resource):
                 'msg': 'Could not connect to postgres instance: {}'.format(connection_error)
             }
 
-        backend = get_backend(get_config())
-        if not backend.exists(entity):
+        if not current_app.postgraas_backend.exists(entity):
             logger.warning(
                 "container {} does not exist, how could that happen?".format(entity.container_id)
             )
@@ -104,8 +108,8 @@ class DBInstanceResource(Resource):
             }
 
         try:
-            backend.delete(entity)
-        except APIError as e:
+            current_app.postgraas_backend.delete(entity)
+        except PostgraasApiException as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
             return {'status': 'failed', 'msg': str(e)}
         db.session.delete(entity)
@@ -135,8 +139,8 @@ class DBInstanceCollectionResource(Resource):
             "db_name": args['db_name'],
             "db_username": args['db_username'],
             "db_pwd": args['db_pwd'],
-            "host": pg.get_hostname(),
-            "port": pg.get_open_port()
+            "host": current_app.postgraas_backend.hostname,
+            "port": current_app.postgraas_backend.port
         }
         if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']
                                       ).first():
@@ -152,11 +156,9 @@ class DBInstanceCollectionResource(Resource):
             hostname=db_credentials['host'],
             port=db_credentials['port']
         )
-        backend = get_backend(get_config())
         try:
-            ## this is an artifact of the docker only version...we should htink about it
-            db_entry.container_id = backend.create(db_entry, db_credentials)
-        except APIError as e:
+            db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
+        except PostgraasApiException as e:
             return {'msg': str(e)}
 
         db.session.add(db_entry)

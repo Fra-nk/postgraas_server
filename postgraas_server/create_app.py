@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 
 from postgraas_server.management_resources import DBInstanceResource, DBInstanceCollectionResource, db
+from postgraas_server.backends import get_backend
 from postgraas_server.configuration import get_meta_db_config_path
 
 
@@ -13,4 +14,5 @@ def create_app(config):
     restful_api.add_resource(DBInstanceResource, "/api/v2/postgraas_instances/<int:id>")
     restful_api.add_resource(DBInstanceCollectionResource, "/api/v2/postgraas_instances")
     db.init_app(app)
+    app.postgraas_backend = get_backend(config)
     return app

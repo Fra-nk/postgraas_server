@@ -12,7 +12,6 @@ class TestManagementDatabase(unittest.TestCase):
         self.this_app = create_app(
             configuration.get_config(os.path.join(self.module_path, 'postgraas_server.cfg'))
         )
-        # self.this_app.debug = True
         self.this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
         self.this_app.use_reloader = False
         self.this_app.config['TESTING'] = True
