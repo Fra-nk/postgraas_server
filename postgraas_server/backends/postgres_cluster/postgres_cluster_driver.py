@@ -24,7 +24,7 @@ def create_postgres_db(postgraas_instance_name, connection_dict, config):
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = con.cursor()
     create_role = "CREATE USER {db_username} WITH PASSWORD '{db_pwd}';".format(**connection_dict)
-    create_database = "CREATE DATABASE {db_name}".format(**connection_dict)
+    create_database = "CREATE DATABASE {db_name} OWNER {db_username};".format(**connection_dict)
     try:
         cur.execute(create_role)
         cur.execute(create_database)

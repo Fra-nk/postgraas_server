@@ -1,3 +1,4 @@
+import os
 import json
 import uuid
 
@@ -36,10 +37,14 @@ port = 54321
 type = pg_cluster
 host = localhost
 port = 5432
-database = postgres
-username = postgres
-password = S3cr3t
-"""
+database = {database}
+username = {username}
+password = {password}
+""".format(
+    database=os.environ.get('DATABASE', 'postgres'),
+    username=os.environ.get('USERNAME', 'postgres'),
+    password=os.environ.get('PASSWORD', 'postgres')
+)
 
 CONFIGS = {
     'docker': DOCKER_CONFIG,
