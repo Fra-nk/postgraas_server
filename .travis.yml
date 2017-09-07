@@ -13,8 +13,8 @@ before_install:
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
-- pip install -U -I setuptools
-- pip install -e .
+- python setup.py bdist_wheel
+- pip install dist/*.whl
 - pip install coveralls
 script: py.test
 after_success:
