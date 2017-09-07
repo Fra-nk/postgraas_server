@@ -41,8 +41,8 @@ database = {database}
 username = {username}
 password = {password}
 """.format(
-    database=os.environ.get('DATABASE', 'postgres'),
-    username=os.environ.get('USERNAME', 'postgres'),
+    database=os.environ.get('PGDATABASE', 'postgres'),
+    username=os.environ.get('PGUSER', 'postgres'),
     password=os.environ.get('PGPASSWORD', 'postgres')
 )
 
