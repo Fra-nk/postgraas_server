@@ -1,4 +1,4 @@
-from . import postgres_instance_driver as pg
+#from . import postgres_instance_driver as pg
 from ..exceptions import PostgraasApiException
 
 
@@ -8,6 +8,7 @@ class DockerBackend(object):
 
     def create(self, entity, connection_info):
         from docker.errors import APIError
+        from . import postgres_instance_driver as pg
         try:
             return pg.create_postgres_instance(entity.postgraas_instance_name, connection_info)
         except APIError as e:
@@ -15,12 +16,14 @@ class DockerBackend(object):
 
     def delete(self, entity):
         from docker.errors import APIError
+        from . import postgres_instance_driver as pg
         try:
             return pg.delete_postgres_instance(entity.container_id)
         except APIError as e:
             raise PostgraasApiException(str(e))
 
     def exists(self, entity):
+        from . import postgres_instance_driver as pg
         return pg.check_container_exists(entity.container_id)
 
     @property
