@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_default_config_filename():
-    config_filename = os.path.join(os.path.abspath(os.getcwd()), "postgraas_server.cfg")
+    config_filename = os.path.join(os.path.abspath(os.getcwd()), "application.cfg")
     return config_filename
 
 
