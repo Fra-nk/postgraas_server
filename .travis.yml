@@ -21,7 +21,7 @@ install:
 - pip install -r test-requirements-pinned.txt
 - pip install pyscaffold
 - pip install coveralls
-- pip install -e .
+- pip install -e .[docker]
 - pip freeze
 
 script: py.test
