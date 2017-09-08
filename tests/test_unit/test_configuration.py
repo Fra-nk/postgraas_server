@@ -9,11 +9,11 @@ class TestConfiguration(unittest.TestCase):
 
     def test_default_config_filename(self):
         actual = cf.get_default_config_filename()
-        expected = os.path.join(os.getcwd(), 'postgraas_server.cfg')
+        expected = os.path.join(os.getcwd(), 'application.cfg')
         self.assertEqual(actual, expected)
 
     def test_get_config(self):
-        test_config = os.path.join(self.module_path, 'postgraas_server.cfg')
+        test_config = os.path.join(self.module_path, 'application.cfg')
         actual = cf.get_config(test_config)
         expected = 'postgraas'
         self.assertEqual(actual.get('metadb', 'db_name'), expected)
