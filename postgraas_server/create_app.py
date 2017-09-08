@@ -15,4 +15,9 @@ def create_app(config):
     restful_api.add_resource(DBInstanceCollectionResource, "/api/v2/postgraas_instances")
     db.init_app(app)
     app.postgraas_backend = get_backend(config)
+
+    @app.route('/health')
+    def health():
+        return "ok"
+
     return app
