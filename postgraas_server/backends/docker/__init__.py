@@ -28,10 +28,12 @@ class DockerBackend(object):
 
     @property
     def hostname(self):
+        from . import postgres_instance_driver as pg
         return pg.get_hostname()
 
     @property
     def port(self):
+        from . import postgres_instance_driver as pg
         return pg.get_open_port()
 
     @property
