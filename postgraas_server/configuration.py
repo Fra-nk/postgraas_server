@@ -1,4 +1,7 @@
+import io
 import os
+import json
+import errno
 import logging
 import ConfigParser
 
@@ -12,10 +15,30 @@ def get_default_config_filename():
     return config_filename
 
 
-def get_config(config_filename=get_default_config_filename()):
+def _load_secrets(filename='/secrets'):
+    try:
+        with open(filename, 'rb') as secrets_file:
+            secrets = json.loads(secrets_file.read())
+    except IOError as e:
+        if e.errno in (errno.ENOENT, errno.EISDIR):
+            return {}
+        e.strerror = 'Unable to load configuration file (%s)' % e.strerror
+        raise
+    return secrets
+
+
+def get_config(config_filename=get_default_config_filename(), secrets_file='/secrets'):
     config = ConfigParser.RawConfigParser()
     logger.debug('config filename: {}'.format(config_filename))
-    config.read(config_filename)
+    secrets = _load_secrets(filename=secrets_file)
+    if secrets:
+        from cryptography.fernet import Fernet
+        f = Fernet(secrets['encryption_key'].encode())
+        with open(config_filename, 'rb') as cfg:
+            cfg_content = f.decrypt(cfg.read())
+        config.readfp(io.BytesIO(cfg_content))
+    else:
+        config.read(config_filename)
     expand_env_vars(config)
     return config
 
