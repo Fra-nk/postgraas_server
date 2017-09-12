@@ -5,7 +5,7 @@ import errno
 import logging
 import ConfigParser
 
-__all__ = ['get_config', 'get_default_config_filename', 'expand_env_vars']
+__all__ = ['get_config', 'get_default_config_filename', 'get_application_config', 'expand_env_vars']
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,13 @@ def expand_env_vars(config):
     for sec in config.sections():
         for opt in config.options(sec):
             config.set(sec, opt, os.path.expandvars(config.get(sec, opt)))
+
+
+def get_application_config(config):
+    try:
+        return config.items('application')
+    except ConfigParser.NoSectionError:
+        return []
 
 
 def get_meta_db_config_path(config):
