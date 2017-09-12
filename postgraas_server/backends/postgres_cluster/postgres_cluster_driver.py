@@ -26,7 +26,7 @@ def create_postgres_db(postgraas_instance_name, connection_dict, config):
     create_role = "CREATE USER {db_username} WITH PASSWORD '{db_pwd}';".format(**connection_dict)
     drop_role = "DROP ROLE {db_username};".format(**connection_dict)
     grant_role = 'GRANT {db_username} TO "{postgraas_user}";'.format(
-        db_username=connection_dict['db_username'], postgraas_user=config['username']
+        db_username=connection_dict['db_username'], postgraas_user=config['username'].split('@')[0]
     )
     create_database = "CREATE DATABASE {db_name} OWNER {db_username};".format(**connection_dict)
     try:
