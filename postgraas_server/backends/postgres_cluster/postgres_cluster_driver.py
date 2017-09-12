@@ -24,6 +24,7 @@ def create_postgres_db(postgraas_instance_name, connection_dict, config):
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = con.cursor()
     create_role = "CREATE USER {db_username} WITH PASSWORD '{db_pwd}';".format(**connection_dict)
+    drop_role = "DROP ROLE {db_username};".format(**connection_dict)
     grant_role = 'GRANT {db_username} TO "{postgraas_user}";'.format(
         db_username=connection_dict['db_username'], postgraas_user=config['username']
     )
@@ -31,8 +32,14 @@ def create_postgres_db(postgraas_instance_name, connection_dict, config):
     try:
         cur.execute(create_role)
         cur.execute(grant_role)
+    except psycopg2.ProgrammingError as e:
+        raise ValueError(e.args[0])
+    # cleanup role in case database creation fails
+    # saidly 'CREATE DATABASE' cannot run inside a transaction block
+    try:
         cur.execute(create_database)
     except psycopg2.ProgrammingError as e:
+        cur.execute(drop_role)
         raise ValueError(e.args[0])
 
 
