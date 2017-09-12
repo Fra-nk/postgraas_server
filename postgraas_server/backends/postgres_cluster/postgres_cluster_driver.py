@@ -16,11 +16,14 @@ def _create_pg_connection(config):
     )
 
 
-def check_db_exists(db_name, config):
+def check_db_or_user_exists(db_name, config):
     con = _create_pg_connection(config)
     cur = con.cursor()
     cur.execute("SELECT 1 FROM pg_database WHERE datname='{}';".format(db_name))
-    return cur.fetchone() is not None
+    db_exists = cur.fetchone() is not None
+    cur.execute("SELECT 1 FROM pg_database WHERE datname='{}';".format(db_name))
+    user_exists = cur.fetchone() is not None
+    return db_exists or user_exists
 
 
 def create_postgres_db(postgraas_instance_name, connection_dict, config):

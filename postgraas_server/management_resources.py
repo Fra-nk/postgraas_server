@@ -159,6 +159,12 @@ class DBInstanceCollectionResource(Resource):
             hostname=db_credentials['host'],
             port=db_credentials['port']
         )
+        if current_app.postgraas_backend.exists(db_entry):
+            return {
+                'msg':
+                "database or user already exists {}, {}".format(args['db_name'], args['db_username'])
+            }
+
         try:
             db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
         except PostgraasApiException as e:

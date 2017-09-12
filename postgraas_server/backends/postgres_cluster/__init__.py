@@ -14,7 +14,7 @@ class PGClusterBackend(object):
         pgcd.delete_user(entity.username, self.config)
 
     def exists(self, entity):
-        return pgcd.check_db_exists(entity.db_name, self.config)
+        return pgcd.check_db_or_user_exists(entity.db_name, self.config)
 
     @property
     def hostname(self):
