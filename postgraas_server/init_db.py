@@ -13,6 +13,13 @@ def main():
         "host": config.get('metadb', 'host'),
         "port": config.get('metadb', 'port')
     }
+
+    try:
+        server = config.get('metadb', 'server')
+        db_credentials['db_username'] = '@'.join([db_credentials['db_username'], server])
+    except ConfigParser.NoOptionError:
+        pass
+
     wait_for_postgres(
         db_credentials['db_name'], db_credentials['db_username'], db_credentials['db_pwd'],
         db_credentials['host'], db_credentials['port']
