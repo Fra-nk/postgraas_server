@@ -67,6 +67,18 @@ you have to add another section to your config to change the default backend::
 The given user has to be able to create new ``roles`` and ``databases`` on the specified
 cluster.
 
+In case you need to log in with usernames of the form ``<username@hostname>``,
+you can use the optional ``server`` config option::
+
+    [backend]
+    type = pg_cluster
+    host = localhost
+    port = 5432
+    database = postgres
+    username = postgres
+    password = S3cr3t
+    server = postgraas-instance-1
+
 .. note::
 
     A big difference to the Docker backend is that with the ``pg_cluster`` backend

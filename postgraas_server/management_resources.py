@@ -135,9 +135,16 @@ class DBInstanceCollectionResource(Resource):
         parser.add_argument('db_username', required=True, type=str, help='username of the db')
         parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
         args = parser.parse_args()
+
+        if '@' not in args['db_username']:
+            try:
+                username = '@'.join([args['db_username'], current_app.postgraas_backend.server])
+            except AttributeError:
+                username = args['db_username']
+
         db_credentials = {
             "db_name": args['db_name'],
-            "db_username": args['db_username'],
+            "db_username": username,
             "db_pwd": args['db_pwd'],
             "host": current_app.postgraas_backend.hostname,
             "port": current_app.postgraas_backend.port

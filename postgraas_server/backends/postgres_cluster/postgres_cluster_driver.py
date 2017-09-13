@@ -3,9 +3,13 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
 def _create_pg_connection(config):
+    if 'server' in config:
+        username = '@'.join([config['username'], config['server']])
+    else:
+        username = config['username']
     return psycopg2.connect(
         database=config['database'],
-        user=config['username'],
+        user=username,
         host=config['host'],
         port=config['port'],
         password=config['password'],
