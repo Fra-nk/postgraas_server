@@ -61,7 +61,7 @@ def get_meta_db_config_path(config):
         server = config.get('metadb', 'server')
         username = '@'.join([config.get('metadb', 'db_username'), server])
     except ConfigParser.NoOptionError:
-        pass
+        username = config.get('metadb', 'db_username')
 
     db_path = 'postgresql://{db_username}:{db_pwd}@{host}:{port}/{db_name}'.format(
         db_name=config.get('metadb', 'db_name'),
