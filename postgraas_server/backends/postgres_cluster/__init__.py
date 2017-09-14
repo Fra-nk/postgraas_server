@@ -6,7 +6,7 @@ class PGClusterBackend(object):
         self.config = config
 
     def create(self, entity, connection_info):
-        pgcd.create_postgres_db(entity.db_name, connection_info, self.config)
+        pgcd.create_postgres_db(connection_info, self.config)
         return entity.id
 
     def delete(self, entity):
@@ -14,7 +14,7 @@ class PGClusterBackend(object):
         pgcd.delete_user(entity.username, self.config)
 
     def exists(self, entity):
-        return pgcd.check_db_or_user_exists(entity.db_name, self.config)
+        return pgcd.check_db_or_user_exists(entity.db_name, entity.username, self.config)
 
     @property
     def hostname(self):

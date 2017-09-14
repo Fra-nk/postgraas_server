@@ -35,15 +35,17 @@ port = 54321
 
 [backend]
 type = pg_cluster
-host = localhost
-port = 5432
+host = {host}
+port = {port}
 database = {database}
 username = {username}
 password = {password}
 """.format(
     database=os.environ.get('PGDATABASE', 'postgres'),
     username=os.environ.get('PGUSER', 'postgres'),
-    password=os.environ.get('PGPASSWORD', 'postgres')
+    password=os.environ.get('PGPASSWORD', 'postgres'),
+    port=os.environ.get('PGPORT', '5432'),
+    host=os.environ.get('PGHOST', 'localhost')
 )
 
 CONFIGS = {

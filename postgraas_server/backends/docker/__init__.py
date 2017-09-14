@@ -24,7 +24,10 @@ class DockerBackend(object):
 
     def exists(self, entity):
         from . import postgres_instance_driver as pg
-        return pg.check_container_exists(entity.container_id)
+        if entity.postgraas_instance_name:
+            return pg.check_container_exists(entity.postgraas_instance_name)
+        else:
+            False
 
     @property
     def hostname(self):
