@@ -45,11 +45,13 @@ def delete_test_database_and_user(db_name, username, config):
     try:
         pgcd.delete_database(db_name, config)
     except ValueError as e:
-        print ValueError(e.args[0])
+        pass
+        #print ValueError(e.args[0])
     try:
         pgcd.delete_user(username, config)
     except ValueError as e:
-        print ValueError(e.args[0])
+        pass
+        #print ValueError(e.args[0])
 
 @pytest.fixture(params=['pg_cluster'])
 def parametrized_setup(request, tmpdir):
@@ -106,7 +108,6 @@ class TestPostgraasApi(PostgraasApiTestBase):
 
         config.readfp(StringIO.StringIO(CONFIGS[self.backend]))
         backend_config = dict(config.items('backend'))
-        print config
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
             "db_name": 'test_create_postgres_instance_exists',
@@ -118,15 +119,15 @@ class TestPostgraasApi(PostgraasApiTestBase):
         delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
         exists = pgcd.check_db_or_user_exists(db_credentials['db_name'], db_credentials['db_username'], backend_config)
         assert exists is False
-        print db_credentials
         pgcd.create_postgres_db(db_credentials, backend_config)
         exists = pgcd.check_db_or_user_exists(db_credentials['db_name'], db_credentials['db_username'], backend_config)
         assert exists is True
         response = self.app_client.post('/api/v2/postgraas_instances',
                                         data=json.dumps(db_credentials),
                                         headers={'Content-Type': 'application/json'})
+        print response.data
         delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
-        assert ("database or user already exists" in json.loads(response.data)['msg']) is True
+        assert ("database or user already exists" in json.loads(response.data)['description']) is True
 
     def test_create_postgres_instance_exists(self):
         config = ConfigParser.ConfigParser()
@@ -153,7 +154,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
                                         data=json.dumps(db_credentials),
                                         headers={'Content-Type': 'application/json'})
         delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
-        assert ("database or user already exists" in json.loads(response.data)['msg']) is True
+        assert ("database or user already exists" in json.loads(response.data)['description']) is True
 
     def test_create_postgres_instance_username_exists(self):
         config = ConfigParser.ConfigParser()
@@ -192,4 +193,4 @@ class TestPostgraasApi(PostgraasApiTestBase):
                                         headers={'Content-Type': 'application/json'})
         delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
         delete_test_database_and_user(db_credentials_same_user['db_name'], db_credentials_same_user['db_username'], backend_config)
-        assert ("database or user already exists" in json.loads(response.data)['msg']) is True
+        assert ("database or user already exists" in json.loads(response.data)['description']) is True

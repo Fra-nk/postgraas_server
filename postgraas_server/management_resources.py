@@ -3,7 +3,7 @@ import logging
 import psycopg2
 
 from flask import current_app
-from flask_restful import fields, Resource, marshal_with, reqparse
+from flask_restful import fields, Resource, marshal_with, reqparse, abort
 from flask_sqlalchemy import SQLAlchemy
 
 from postgraas_server.backends.exceptions import PostgraasApiException
@@ -160,10 +160,9 @@ class DBInstanceCollectionResource(Resource):
             port=db_credentials['port']
         )
         if current_app.postgraas_backend.exists(db_entry):
-            return {
-                'msg':
-                "database or user already exists {}, {}".format(args['db_name'], args['db_username'])
-            }
+            abort(409,
+                description="database or user already exists {}, {}".format(args['db_name'], args['db_username'])
+            )
 
         try:
             db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
@@ -175,8 +174,8 @@ class DBInstanceCollectionResource(Resource):
                 username = '@'.join([args['db_username'], current_app.postgraas_backend.server])
             except (AttributeError, KeyError):
                 username = args['db_username']
+            db_entry.username = username
 
-        db_entry.username = username
         db.session.add(db_entry)
         db.session.commit()
         db_credentials["container_id"] = db_entry.container_id

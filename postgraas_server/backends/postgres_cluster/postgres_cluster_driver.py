@@ -24,8 +24,6 @@ def check_db_or_user_exists(db_name, db_user, config):
     cur.execute("SELECT 1 FROM pg_roles WHERE rolname='{}';".format(db_user))
     user = cur.fetchone()
     user_exists = user is not None
-    print user
-    print user_exists
     return db_exists or user_exists
 
 
