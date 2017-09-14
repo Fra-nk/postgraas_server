@@ -123,7 +123,6 @@ class DBInstanceCollectionResource(Resource):
         all = DBInstance.query.all()
         return all
 
-    @marshal_with(db_instance_marshaller)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument(
@@ -168,7 +167,7 @@ class DBInstanceCollectionResource(Resource):
         if '@' not in args['db_username']:
             try:
                 username = '@'.join([args['db_username'], current_app.postgraas_backend.server])
-            except AttributeError, KeyError:
+            except (AttributeError, KeyError):
                 username = args['db_username']
 
         db_entry.username = username
@@ -176,4 +175,5 @@ class DBInstanceCollectionResource(Resource):
         db.session.commit()
         db_credentials["container_id"] = db_entry.container_id
         db_credentials["postgraas_instance_id"] = db_entry.id
-        return db_entry, 201
+        db_credentials["db_username"] = username
+        return db_credentials, 201
