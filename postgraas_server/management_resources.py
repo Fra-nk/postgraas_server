@@ -123,6 +123,7 @@ class DBInstanceCollectionResource(Resource):
         all = DBInstance.query.all()
         return all
 
+    @marshal_with(db_instance_marshaller)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument(
@@ -136,29 +137,25 @@ class DBInstanceCollectionResource(Resource):
         parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
         args = parser.parse_args()
 
-        if '@' not in args['db_username']:
-            try:
-                username = '@'.join([args['db_username'], current_app.postgraas_backend.server])
-            except AttributeError:
-                username = args['db_username']
-
-        db_credentials = {
-            "db_name": args['db_name'],
-            "db_username": username,
-            "db_pwd": args['db_pwd'],
-            "host": current_app.postgraas_backend.hostname,
-            "port": current_app.postgraas_backend.port
-        }
         if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']
                                       ).first():
             return {
                 'msg':
                 "postgraas_instance_name already exists {}".format(args['postgraas_instance_name'])
             }
+
+        db_credentials = {
+            "db_name": args['db_name'],
+            "db_username": args['db_username'],
+            "db_pwd": args['db_pwd'],
+            "host": current_app.postgraas_backend.hostname,
+            "port": current_app.postgraas_backend.port
+        }
+
         db_entry = DBInstance(
             postgraas_instance_name=args['postgraas_instance_name'],
             db_name=args['db_name'],
-            username=args['db_username'],
+            username=db_credentials['db_username'],
             password="",
             hostname=db_credentials['host'],
             port=db_credentials['port']
@@ -168,8 +165,15 @@ class DBInstanceCollectionResource(Resource):
         except PostgraasApiException as e:
             return {'msg': str(e)}
 
+        if '@' not in args['db_username']:
+            try:
+                username = '@'.join([args['db_username'], current_app.postgraas_backend.server])
+            except AttributeError, KeyError:
+                username = args['db_username']
+
+        db_entry.username = username
         db.session.add(db_entry)
         db.session.commit()
         db_credentials["container_id"] = db_entry.container_id
         db_credentials["postgraas_instance_id"] = db_entry.id
-        return db_credentials
+        return db_entry, 201

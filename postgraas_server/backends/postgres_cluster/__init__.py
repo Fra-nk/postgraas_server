@@ -25,5 +25,9 @@ class PGClusterBackend(object):
         return self.config['port']
 
     @property
+    def server(self):
+        return self.config['server']
+
+    @property
     def master_hostname(self):
         return self.hostname
