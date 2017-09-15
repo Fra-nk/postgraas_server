@@ -103,7 +103,7 @@ class PostgraasApiTestBase:
 @pytest.mark.usefixtures('parametrized_setup')
 class TestPostgraasApi(PostgraasApiTestBase):
 
-    def test_delete_user(self):
+    def test_delete_db_and_user(self):
         config = ConfigParser.ConfigParser()
 
         config.readfp(StringIO.StringIO(CONFIGS[self.backend]))
@@ -126,8 +126,14 @@ class TestPostgraasApi(PostgraasApiTestBase):
                                         data=json.dumps(db_credentials),
                                         headers={'Content-Type': 'application/json'})
         print response.data
-        delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
         assert ("database or user already exists" in json.loads(response.data)['description']) is True
+        delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
+        response = self.app_client.post('/api/v2/postgraas_instances',
+                                        data=json.dumps(db_credentials),
+                                        headers={'Content-Type': 'application/json'})
+        print response.data
+        assert ("test_create_postgres_instance_exists" in json.loads(response.data)['db_name']) is True
+
 
     def test_create_postgres_instance_exists(self):
         config = ConfigParser.ConfigParser()
