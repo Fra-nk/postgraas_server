@@ -1,36 +1,36 @@
 import os
 import uuid
 import json
-import io
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import pytest
-from configparser import ConfigParser
 
 import postgraas_server.configuration as configuration
 from postgraas_server.create_app import create_app
 import postgraas_server.backends.postgres_cluster.postgres_cluster_driver as pgcd
-from postgraas_server.backends.postgres_cluster import PGClusterBackend
 
-CLUSTER_CONFIG = u"""[metadb]
-db_name = postgraas
-db_username = postgraas
-db_pwd = postgraas12
-host = localhost
-port = 54321
 
-[backend]
-type = pg_cluster
-host = {host}
-port = {port}
-database = {database}
-username = {username}
-password = {password}
-""".format(
-    database=os.environ.get('PGDATABASE', 'postgres'),
-    username=os.environ.get('PGUSER', 'postgres'),
-    password=os.environ.get('PGPASSWORD', 'postgres'),
-    port=os.environ.get('PGPORT', '5432'),
-    host=os.environ.get('PGHOST', 'localhost')
-)
+CLUSTER_CONFIG = {
+    "metadb":
+    {
+        "db_name": "postgraas",
+        "db_username": "postgraas",
+        "db_pwd": "postgraas12",
+        "host": "localhost",
+        "port": "54321"
+    },
+    "backend":
+    {
+        "type": "docker",
+        "host": os.environ.get('PGHOST', 'localhost'),
+        "port": os.environ.get('PGPORT', '5432'),
+        "database": os.environ.get('PGDATABASE', 'postgres'),
+        "username": os.environ.get('PGUSER', 'postgres'),
+        "password": os.environ.get('PGPASSWORD', 'postgres')
+    }
+}
 
 CONFIGS = {
     'pg_cluster': CLUSTER_CONFIG,
@@ -56,9 +56,7 @@ def delete_test_database_and_user(db_name, username, config):
 @pytest.fixture(params=['pg_cluster'])
 def parametrized_setup(request, tmpdir):
     from postgraas_server.management_resources import db
-    cfg = tmpdir.join('config')
-    cfg.write(CONFIGS[request.param])
-    config = configuration.get_config(cfg.strpath)
+    config = CONFIGS[request.param]
     this_app = create_app(config)
     this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     this_app.use_reloader = False
@@ -104,10 +102,7 @@ class PostgraasApiTestBase:
 class TestPostgraasApi(PostgraasApiTestBase):
 
     def test_delete_db_and_user(self):
-        config = ConfigParser()
-
-        config.read_string(CONFIGS[self.backend])
-        backend_config = dict(config.items('backend'))
+        backend_config = CONFIGS[self.backend]['backend']
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
             "db_name": 'test_create_postgres_instance_exists',
@@ -136,11 +131,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
 
 
     def test_create_postgres_instance_exists(self):
-        config = ConfigParser()
-
-        config.read_string(CONFIGS[self.backend])
-        backend_config = dict(config.items('backend'))
-        print(config)
+        backend_config = CONFIGS[self.backend]['backend']
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
             "db_name": 'test_create_postgres_instance_exists',
@@ -163,11 +154,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
         assert ("database or user already exists" in json.loads(response.get_data(as_text=True))['description']) is True
 
     def test_create_postgres_instance_username_exists(self):
-        config = ConfigParser()
-
-        config.read_string(CONFIGS[self.backend])
-        backend_config = dict(config.items('backend'))
-        print(config)
+        backend_config = CONFIGS[self.backend]['backend']
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
             "db_name": 'test_create_postgres_instance_exists',
@@ -202,11 +189,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
         assert ("database or user already exists" in json.loads(response.get_data(as_text=True))['description']) is True
 
     def test_create_postgres_instance_bad_username(self):
-        config = ConfigParser()
-
-        config.read_string(CONFIGS[self.backend])
-        backend_config = dict(config.items('backend'))
-        print(config)
+        backend_config = CONFIGS[self.backend]['backend']
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
             "db_name": 'test_create_postgres_instance_exists',
